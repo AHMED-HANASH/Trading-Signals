@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignalAI Pro - Advanced AI Trading Signals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link href="https://unpkg.com/splitting@1.0.6/dist/splitting.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0a;
+            overflow-x: hidden;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .gradient-text {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-bg {
+            background: radial-gradient(ellipse at center, #1a1a1a 0%, #000000 100%);
+            position: relative;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23333" stroke-width="0.5" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.1;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.6); }
+        }
+        .signal-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #333;
+        }
+        .accuracy-bar {
+            background: linear-gradient(90deg, #00ff88 0%, #00d4ff 100%);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00d4ff;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+        .chart-container {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #333;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00d4ff;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">SA</span>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">SignalAI Pro</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-link text-gray-300 hover:text-white">Home</a>
+                    <a href="features.html" class="nav-link text-gray-300 hover:text-white">Features</a>
+                    <a href="performance.html" class="nav-link text-gray-300 hover:text-white">Performance</a>
+                    <a href="about.html" class="nav-link text-gray-300 hover:text-white">About</a>
+                    <button class="bg-gradient-to-r from-blue-600 to-green-600 px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                        Download App
+                    </button>
+                </div>
+                <button class="md:hidden text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg min-h-screen flex items-center relative pt-20">
+        <div class="floating-particles" id="particles"></div>
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-8">
+                <div class="space-y-4">
+                    <h1 class="text-5xl lg:text-7xl font-bold leading-tight">
+                        <span class="block">AI-Powered</span>
+                        <span class="block gradient-text" id="typed-text"></span>
+                        <span class="block">Signals</span>
+                    </h1>
+                    <p class="text-xl text-gray-400 max-w-lg leading-relaxed">
+                        Advanced multi-model ensemble delivering 90%+ win rate trading signals with real-time chart annotation and offline capability.
+                    </p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="scrollToSimulator()" class="bg-gradient-to-r from-blue-600 to-green-600 px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition-all transform hover:scale-105 pulse-glow">
+                        Try Signal Simulator
+                    </button>
+                    <button onclick="scrollToPerformance()" class="border border-gray-600 px-8 py-4 rounded-xl font-semibold text-lg hover:border-gray-400 transition-all">
+                        View Performance
+                    </button>
+                </div>
+                <div class="grid grid-cols-3 gap-6 pt-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold gradient-text mono" id="accuracy-counter">90</div>
+                        <div class="text-sm text-gray-400">% Win Rate</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold gradient-text mono" id="signals-counter">15.2M</div>
+                        <div class="text-sm text-gray-400">Signals Processed</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold gradient-text mono" id="models-counter">4</div>
+                        <div class="text-sm text-gray-400">AI Models</div>
+                    </div>
+                </div>
+            </div>
+            <div class="relative">
+                <img src="resources/hero-image.png" alt="AI Trading Platform" class="w-full h-auto rounded-2xl shadow-2xl">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-2xl"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signal Simulator -->
+    <section id="simulator" class="py-20 bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Live Signal Simulator</h2>
+                <p class="text-xl text-gray-400">Experience our AI-powered signal generation in real-time</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="signal-card rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Trading Pair</h3>
+                        <select id="trading-pair" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-blue-500 focus:outline-none">
+                            <option value="BTCUSDT">BTC/USDT</option>
+                            <option value="EURUSD">EUR/USD</option>
+                            <option value="GOLD">GOLD</option>
+                            <option value="NAS100">NASDAQ 100</option>
+                            <option value="ETHUSDT">ETH/USDT</option>
+                        </select>
+                    </div>
+                    <div class="signal-card rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Timeframe</h3>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="timeframe-btn bg-gray-800 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors" data-timeframe="15m">15m</button>
+                            <button class="timeframe-btn bg-gray-800 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors" data-timeframe="1h">1h</button>
+                            <button class="timeframe-btn bg-blue-600 px-4 py-2 rounded-lg transition-colors" data-timeframe="4h">4h</button>
+                            <button class="timeframe-btn bg-gray-800 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors" data-timeframe="1D">1D</button>
+                            <button class="timeframe-btn bg-gray-800 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors" data-timeframe="1W">1W</button>
+                        </div>
+                    </div>
+                    <div class="signal-card rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Chart Analysis</h3>
+                        <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+                            <div class="text-gray-400 mb-2">Upload Chart Image</div>
+                            <div class="text-sm text-gray-500">PNG, JPG, PDF supported</div>
+                        </div>
+                    </div>
+                    <button id="generate-signal" class="w-full bg-gradient-to-r from-blue-600 to-green-600 px-6 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition-all transform hover:scale-105">
+                        Generate AI Signal
+                    </button>
+                </div>
+                <div class="chart-container">
+                    <div id="signal-chart" style="height: 400px;"></div>
+                    <div id="signal-results" class="mt-6 space-y-4 hidden">
+                        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                            <span class="text-gray-400">Signal Direction:</span>
+                            <span id="signal-direction" class="font-semibold text-green-400">LONG</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-gray-800 rounded-lg">
+                                <div class="text-gray-400 text-sm">Entry Point</div>
+                                <div id="entry-price" class="text-xl font-bold mono">$43,250.00</div>
+                            </div>
+                            <div class="p-4 bg-gray-800 rounded-lg">
+                                <div class="text-gray-400 text-sm">Confidence</div>
+                                <div id="confidence" class="text-xl font-bold mono">94.2%</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="p-4 bg-gray-800 rounded-lg">
+                                <div class="text-gray-400 text-sm">TP1</div>
+                                <div id="tp1" class="font-bold mono text-green-400">$43,650.00</div>
+                            </div>
+                            <div class="p-4 bg-gray-800 rounded-lg">
+                                <div class="text-gray-400 text-sm">TP2</div>
+                                <div id="tp2" class="font-bold mono text-green-400">$44,050.00</div>
+                            </div>
+                            <div class="p-4 bg-gray-800 rounded-lg">
+                                <div class="text-gray-400 text-sm">SL</div>
+                                <div id="sl" class="font-bold mono text-red-400">$42,850.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Model Accuracy -->
+    <section id="models" class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Multi-Model AI Ensemble</h2>
+                <p class="text-xl text-gray-400">Four advanced models working together for superior accuracy</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="model-card signal-card rounded-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">CNN Model</h3>
+                        <div class="w-3 h-3 bg-green-400 rounded-full pulse-glow"></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Accuracy</span>
+                            <span class="font-bold mono">91.3%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="accuracy-bar" style="width: 91.3%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500">Image Pattern Recognition</div>
+                    </div>
+                </div>
+                <div class="model-card signal-card rounded-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">LSTM Model</h3>
+                        <div class="w-3 h-3 bg-green-400 rounded-full pulse-glow"></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Accuracy</span>
+                            <span class="font-bold mono">89.7%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="accuracy-bar" style="width: 89.7%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500">Sequence Analysis</div>
+                    </div>
+                </div>
+                <div class="model-card signal-card rounded-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Transformer</h3>
+                        <div class="w-3 h-3 bg-green-400 rounded-full pulse-glow"></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Accuracy</span>
+                            <span class="font-bold mono">92.1%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="accuracy-bar" style="width: 92.1%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500">Attention Mechanism</div>
+                    </div>
+                </div>
+                <div class="model-card signal-card rounded-xl p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Classical TA</h3>
+                        <div class="w-3 h-3 bg-green-400 rounded-full pulse-glow"></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Accuracy</span>
+                            <span class="font-bold mono">88.5%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="accuracy-bar" style="width: 88.5%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500">Technical Patterns</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 text-center">
+                <div class="signal-card rounded-xl p-8 max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-4">Ensemble Performance</h3>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <div class="text-4xl font-bold gradient-text mono mb-2" id="ensemble-accuracy">94.2%</div>
+                            <div class="text-gray-400">Combined Accuracy</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold gradient-text mono mb-2" id="signals-generated">1,247</div>
+                            <div class="text-gray-400">Signals This Week</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section class="py-20 bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Why Choose SignalAI Pro</h2>
+                <p class="text-xl text-gray-400">Professional-grade trading signals powered by cutting-edge AI</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="signal-card rounded-xl p-6 card-hover">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">90%+ Win Rate</h3>
+                    <p class="text-gray-400">Proven track record with strict statistical filtering for maximum accuracy</p>
+                </div>
+                <div class="signal-card rounded-xl p-6 card-hover">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Offline Capability</h3>
+                    <p class="text-gray-400">800MB model weights enable 100% offline operation after initial download</p>
+                </div>
+                <div class="signal-card rounded-xl p-6 card-hover">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Real-time Annotation</h3>
+                    <p class="text-gray-400">Automatic chart markup with entry points, TP/SL levels, and confidence scores</p>
+                </div>
+                <div class="signal-card rounded-xl p-6 card-hover">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Encrypted Ledger</h3>
+                    <p class="text-gray-400">Secure on-device storage of all predictions for complete auditability</p>
+                </div>
+                <div class="signal-card rounded-xl p-6 card-hover">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Lightning Fast</h3>
+                    <p class="text-gray-400">4-second signal generation with optimized models for real-time trading</p>
+                </div>
+                <div class="signal-card rounded-xl p-6 card-hover">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Multi-Platform</h3>
+                    <p class="text-gray-400">Native iOS and Android apps with synchronized performance across devices</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Preview -->
+    <section id="performance-preview" class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Proven Performance</h2>
+                <p class="text-xl text-gray-400">Real results from our AI ensemble over the past 12 months</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="signal-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-4">Win Rate by Month</h3>
+                    <div id="performance-chart" style="height: 300px;"></div>
+                </div>
+                <div class="space-y-6">
+                    <div class="signal-card rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Recent Signals</h3>
+                        <div class="space-y-3" id="recent-signals">
+                            <!-- Signals will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-12">
+                <a href="performance.html" class="bg-gradient-to-r from-blue-600 to-green-600 px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition-all inline-block transform hover:scale-105">
+                    View Detailed Performance
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-900/50 to-green-900/50">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-6">Ready to Transform Your Trading?</h2>
+            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Join thousands of traders using AI-powered signals to make smarter, more profitable decisions in real-time.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="bg-gradient-to-r from-blue-600 to-green-600 px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition-all transform hover:scale-105 pulse-glow">
+                    Download for iOS
+                </button>
+                <button class="bg-gradient-to-r from-blue-600 to-green-600 px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition-all transform hover:scale-105">
+                    Download for Android
+                </button>
+            </div>
+            <p class="text-sm text-gray-500 mt-6">
+                Free 7-day trial • No credit card required • 90%+ win rate guarantee
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">SA</span>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">SignalAI Pro</span>
+                </div>
+                <div class="text-gray-400 text-sm">
+                    © 2024 SignalAI Pro. All rights reserved. Trading involves risk.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>

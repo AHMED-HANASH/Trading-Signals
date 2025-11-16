@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance - SignalAI Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0a;
+            overflow-x: hidden;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .gradient-text {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .signal-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #333;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00d4ff;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: black;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">SA</span>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">SignalAI Pro</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-gray-300 hover:text-white">Home</a>
+                    <a href="features.html" class="nav-link text-gray-300 hover:text-white">Features</a>
+                    <a href="performance.html" class="nav-link text-white">Performance</a>
+                    <a href="about.html" class="nav-link text-gray-300 hover:text-white">About</a>
+                    <button class="bg-gradient-to-r from-blue-600 to-green-600 px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                        Download App
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-gradient-to-br from-gray-900/50 to-black">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="max-w-3xl mx-auto">
+                <h1 class="text-5xl lg:text-6xl font-bold mb-6">
+                    Proven <span class="gradient-text">Performance</span>
+                </h1>
+                <p class="text-xl text-gray-400 mb-8">
+                    Transparent, verifiable results from our AI trading system over the past 12 months
+                </p>
+            </div>
+            <div class="relative max-w-4xl mx-auto">
+                <img src="resources/dashboard.png" alt="Performance Dashboard" class="w-full h-auto rounded-2xl shadow-2xl">
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Dashboard -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Interactive Performance Dashboard</h2>
+                <p class="text-xl text-gray-400">Real-time metrics and historical performance data</p>
+            </div>
+            
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-4 justify-center mb-8">
+                <button class="filter-btn active bg-gray-800 px-6 py-2 rounded-lg" data-filter="all">All Pairs</button>
+                <button class="filter-btn bg-gray-800 px-6 py-2 rounded-lg" data-filter="BTCUSDT">BTC/USDT</button>
+                <button class="filter-btn bg-gray-800 px-6 py-2 rounded-lg" data-filter="EURUSD">EUR/USD</button>
+                <button class="filter-btn bg-gray-800 px-6 py-2 rounded-lg" data-filter="GOLD">GOLD</button>
+                <button class="filter-btn bg-gray-800 px-6 py-2 rounded-lg" data-filter="ETHUSDT">ETH/USDT</button>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                <div class="signal-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-4">Win Rate Trend</h3>
+                    <div id="win-rate-chart" style="height: 350px;"></div>
+                </div>
+                <div class="signal-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-4">Profit Factor by Month</h3>
+                    <div id="profit-chart" style="height: 350px;"></div>
+                </div>
+            </div>
+            
+            <div class="grid lg:grid-cols-3 gap-8 mb-12">
+                <div class="signal-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-4">Risk Metrics</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Max Drawdown</span>
+                            <span class="font-mono text-red-400">-3.2%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Sharpe Ratio</span>
+                            <span class="font-mono text-green-400">2.84</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Profit Factor</span>
+                            <span class="font-mono text-green-400">3.12</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Max Consecutive Wins</span>
+                            <span class="font-mono text-green-400">23</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Max Consecutive Losses</span>
+                            <span class="font-mono text-red-400">3</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="signal-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-4">Signal Statistics</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Total Signals</span>
+                            <span class="font-mono">15,247</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Winning Signals</span>
+                            <span class="font-mono text-green-400">13,769</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Losing Signals</span>
+                            <span class="font-mono text-red-400">1,478</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Average Hold Time</span>
+                            <span class="font-mono">4.2h</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Signal Frequency</span>
+                            <span class="font-mono">42/day</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="signal-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-4">Performance Summary</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Total Return</span>
+                            <span class="font-mono text-green-400">+284.7%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Annual Return</span>
+                            <span class="font-mono text-green-400">+142.3%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Volatility</span>
+                            <span class="font-mono">12.4%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Best Month</span>
+                            <span class="font-mono text-green-400">+28.5%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Worst Month</span>
+                            <span class="font-mono text-red-400">-2.1%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signal History -->
+    <section class="py-20 bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Recent Signal History</h2>
+                <p class="text-xl text-gray-400">Complete transparency with detailed signal tracking</p>
+            </div>
+            
+            <div class="signal-card rounded-xl p-6">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 space-y-4 lg:space-y-0">
+                    <div class="flex flex-wrap gap-4">
+                        <input type="text" placeholder="Search signals..." class="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none">
+                        <select class="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none">
+                            <option>All Outcomes</option>
+                            <option>Win</option>
+                            <option>Loss</option>
+                            <option>Pending</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Export CSV</button>
+                        <button class="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">Export PNG</button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="text-left py-3 px-4">Time</th>
+                                <th class="text-left py-3 px-4">Pair</th>
+                                <th class="text-left py-3 px-4">Direction</th>
+                                <th class="text-left py-3 px-4">Entry</th>
+                                <th class="text-left py-3 px-4">TP1</th>
+                                <th class="text-left py-3 px-4">TP2</th>
+                                <th class="text-left py-3 px-4">SL</th>
+                                <th class="text-left py-3 px-4">Outcome</th>
+                                <th class="text-left py-3 px-4">P&L</th>
+                                <th class="text-left py-3 px-4">Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="signal-history">
+                            <!-- Table content will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="flex justify-center mt-6">
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">Previous</button>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg">1</button>
+                        <button class="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">2</button>
+                        <button class="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">3</button>
+                        <button class="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">AI vs Traditional Methods</h2>
+                <p class="text-xl text-gray-400">See how our AI ensemble outperforms conventional trading approaches</p>
+            </div>
+            <div class="signal-card rounded-xl p-8">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="text-left py-4 px-6">Method</th>
+                                <th class="text-center py-4 px-6">Win Rate</th>
+                                <th class="text-center py-4 px-6">Profit Factor</th>
+                                <th class="text-center py-4 px-6">Max Drawdown</th>
+                                <th class="text-center py-4 px-6">Signals/Month</th>
+                                <th class="text-center py-4 px-6">Response Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 px-6 font-semibold">SignalAI Pro (Ensemble)</td>
+                                <td class="py-4 px-6 text-center text-green-400 font-mono">90.3%</td>
+                                <td class="py-4 px-6 text-center text-green-400 font-mono">3.12</td>
+                                <td class="py-4 px-6 text-center text-green-400 font-mono">-3.2%</td>
+                                <td class="py-4 px-6 text-center font-mono">1,247</td>
+                                <td class="py-4 px-6 text-center font-mono">4.2s</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 px-6">Traditional Technical Analysis</td>
+                                <td class="py-4 px-6 text-center text-yellow-400 font-mono">65.2%</td>
+                                <td class="py-4 px-6 text-center text-yellow-400 font-mono">1.87</td>
+                                <td class="py-4 px-6 text-center text-red-400 font-mono">-12.8%</td>
+                                <td class="py-4 px-6 text-center font-mono">156</td>
+                                <td class="py-4 px-6 text-center font-mono">Manual</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 px-6">Single AI Model</td>
+                                <td class="py-4 px-6 text-center text-yellow-400 font-mono">78.4%</td>
+                                <td class="py-4 px-6 text-center text-yellow-400 font-mono">2.34</td>
+                                <td class="py-4 px-6 text-center text-red-400 font-mono">-8.7%</td>
+                                <td class="py-4 px-6 text-center font-mono">892</td>
+                                <td class="py-4 px-6 text-center font-mono">2.1s</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 px-6">Human Expert Analysis</td>
+                                <td class="py-4 px-6 text-center text-yellow-400 font-mono">72.1%</td>
+                                <td class="py-4 px-6 text-center text-yellow-400 font-mono">2.01</td>
+                                <td class="py-4 px-6 text-center text-red-400 font-mono">-15.3%</td>
+                                <td class="py-4 px-6 text-center font-mono">23</td>
+                                <td class="py-4 px-6 text-center font-mono">Hours</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-900/50 to-green-900/50">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-6">Ready to Join the AI Trading Revolution?</h2>
+            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Experience the power of professional AI trading signals with proven performance and transparent results.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="bg-gradient-to-r from-blue-600 to-green-600 px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition-all transform hover:scale-105">
+                    Start Your Free Trial
+                </button>
+                <a href="features.html" class="border border-gray-600 px-8 py-4 rounded-xl font-semibold text-lg hover:border-gray-400 transition-all">
+                    Explore Features
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">SA</span>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">SignalAI Pro</span>
+                </div>
+                <div class="text-gray-400 text-sm">
+                    © 2024 SignalAI Pro. All rights reserved. Trading involves risk.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize performance charts and signal history
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePerformanceCharts();
+            initializeSignalHistory();
+            initializeFilters();
+        });
+
+        function initializePerformanceCharts() {
+            // Win Rate Chart
+            const winRateChart = echarts.init(document.getElementById('win-rate-chart'));
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const winRates = [89.2, 91.5, 88.7, 92.1, 90.3, 89.8, 91.2, 90.7, 92.5, 89.9, 91.8, 90.4];
+            
+            winRateChart.setOption({
+                backgroundColor: 'transparent',
+                grid: { left: '10%', right: '10%', top: '10%', bottom: '15%' },
+                xAxis: {
+                    type: 'category',
+                    data: months,
+                    axisLine: { lineStyle: { color: '#666' } },
+                    axisLabel: { color: '#999' }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 85,
+                    max: 95,
+                    axisLine: { lineStyle: { color: '#666' } },
+                    axisLabel: { color: '#999', formatter: '{value}%' },
+                    splitLine: { lineStyle: { color: '#333' } }
+                },
+                series: [{
+                    type: 'line',
+                    data: winRates,
+                    smooth: true,
+                    lineStyle: { color: '#00d4ff', width: 3 },
+                    itemStyle: { color: '#00d4ff' },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(0, 212, 255, 0.3)' },
+                                { offset: 1, color: 'rgba(0, 212, 255, 0)' }
+                            ]
+                        }
+                    }
+                }]
+            });
+
+            // Profit Factor Chart
+            const profitChart = echarts.init(document.getElementById('profit-chart'));
+            const profitFactors = [2.8, 3.2, 2.9, 3.5, 3.1, 2.7, 3.3, 3.0, 3.4, 2.9, 3.2, 3.1];
+            
+            profitChart.setOption({
+                backgroundColor: 'transparent',
+                grid: { left: '10%', right: '10%', top: '10%', bottom: '15%' },
+                xAxis: {
+                    type: 'category',
+                    data: months,
+                    axisLine: { lineStyle: { color: '#666' } },
+                    axisLabel: { color: '#999' }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 2,
+                    max: 4,
+                    axisLine: { lineStyle: { color: '#666' } },
+                    axisLabel: { color: '#999' },
+                    splitLine: { lineStyle: { color: '#333' } }
+                },
+                series: [{
+                    type: 'bar',
+                    data: profitFactors,
+                    itemStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: '#00ff88' },
+                                { offset: 1, color: '#00d4ff' }
+                            ]
+                        }
+                    }
+                }]
+            });
+        }
+
+        function initializeSignalHistory() {
+            const container = document.getElementById('signal-history');
+            const signals = generateSignalHistory();
+            
+            signals.forEach(signal => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-800 hover:bg-gray-800/50 transition-colors';
+                
+                const outcomeColor = signal.outcome === 'WIN' ? 'text-green-400' : signal.outcome === 'LOSS' ? 'text-red-400' : 'text-yellow-400';
+                const pnlColor = signal.pnl.startsWith('+') ? 'text-green-400' : 'text-red-400';
+                
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-gray-400">${signal.time}</td>
+                    <td class="py-3 px-4 font-medium">${signal.pair}</td>
+                    <td class="py-3 px-4 ${signal.direction === 'LONG' ? 'text-green-400' : 'text-red-400'}">${signal.direction}</td>
+                    <td class="py-3 px-4 font-mono">${signal.entry}</td>
+                    <td class="py-3 px-4 font-mono text-green-400">${signal.tp1}</td>
+                    <td class="py-3 px-4 font-mono text-green-400">${signal.tp2}</td>
+                    <td class="py-3 px-4 font-mono text-red-400">${signal.sl}</td>
+                    <td class="py-3 px-4 font-medium ${outcomeColor}">${signal.outcome}</td>
+                    <td class="py-3 px-4 font-mono ${pnlColor}">${signal.pnl}</td>
+                    <td class="py-3 px-4 font-mono">${signal.confidence}%</td>
+                `;
+                
+                container.appendChild(row);
+            });
+        }
+
+        function generateSignalHistory() {
+            const pairs = ['BTC/USDT', 'EUR/USD', 'GOLD', 'ETH/USDT', 'NAS100'];
+            const directions = ['LONG', 'SHORT'];
+            const outcomes = ['WIN', 'LOSS', 'PENDING'];
+            const signals = [];
+            
+            for (let i = 0; i < 50; i++) {
+                const pair = pairs[Math.floor(Math.random() * pairs.length)];
+                const direction = directions[Math.floor(Math.random() * directions.length)];
+                const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+                const entry = (Math.random() * 50000 + 10000).toFixed(2);
+                const tp1 = (parseFloat(entry) + (direction === 'LONG' ? 400 : -400)).toFixed(2);
+                const tp2 = (parseFloat(entry) + (direction === 'LONG' ? 800 : -800)).toFixed(2);
+                const sl = (parseFloat(entry) + (direction === 'LONG' ? -400 : 400)).toFixed(2);
+                const pnl = outcome === 'WIN' ? `+${(Math.random() * 5 + 1).toFixed(1)}%` : 
+                           outcome === 'LOSS' ? `-${(Math.random() * 2 + 0.5).toFixed(1)}%` : '0.0%';
+                const confidence = Math.floor(Math.random() * 10 + 90);
+                
+                signals.push({
+                    time: `${Math.floor(Math.random() * 24 + 1)}h ago`,
+                    pair,
+                    direction,
+                    entry: `$${entry}`,
+                    tp1: `$${tp1}`,
+                    tp2: `$${tp2}`,
+                    sl: `$${sl}`,
+                    outcome,
+                    pnl,
+                    confidence
+                });
+            }
+            
+            return signals;
+        }
+
+        function initializeFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // In a real app, this would filter the data and update charts
+                    console.log('Filter applied:', this.dataset.filter);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
